@@ -8,6 +8,7 @@ ENV SPACK_ROOT=/spack        \
     FORCE_UNSAFE_CONFIGURE=1 \
     DISTRO=centos
 
+# Spack requirements
 RUN yum update -y               && \
     yum install -y epel-release && \
     yum update -y               && \
@@ -29,7 +30,23 @@ RUN yum update -y               && \
         python                \
         tcl                && \
     git clone --depth 1 git://github.com/spack/spack.git /spack && \
-    rm -rf /spack/.git /var/cache/yum && yum clean all
+    rm -rf /spack/.git
+
+# SL7 software collection requirements
+RUN yum install -y centos-release-scl-rh   && \
+    yum install -y --setopt=tsflags=nodocs    \
+        llvm-toolset-7                        \
+        devtoolset-6-gcc                      \
+        devtoolset-6-gcc-c++                  \
+        devtoolset-6-gcc-gfortran             \
+        devtoolset-6-gdb                   && \
+    rpm -V                                    \
+        llvm-toolset-7                        \
+        devtoolset-6-gcc                      \
+        devtoolset-6-gcc-c++                  \
+        devtoolset-6-gcc-gfortran             \
+        devtoolset-6-gdb                   && \
+    rm -rf /var/cache/yum && yum clean all -y
 
 RUN echo "source /usr/share/lmod/lmod/init/bash" \
     > /etc/profile.d/spack.sh
